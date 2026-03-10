@@ -187,25 +187,13 @@ export async function generateReport(
             ],
           }),
 
-          // 5. Org paragraph — org name bold, rest normal
+          // 5. Org paragraph — org text bold, rest normal
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
             spacing: { before: 0, after: 200 },
             children: [
               new TextRun({
-                text: `очень странного цирка \u201C`,
-                bold: true,
-                font: FONT,
-                size: FONT_SIZE,
-              }),
-              new TextRun({
                 text: organizationName,
-                bold: true,
-                font: FONT,
-                size: FONT_SIZE,
-              }),
-              new TextRun({
-                text: `\u201D`,
                 bold: true,
                 font: FONT,
                 size: FONT_SIZE,

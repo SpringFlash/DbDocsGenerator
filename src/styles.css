@@ -264,6 +264,10 @@ body {
   width: 220px;
 }
 
+.inline-field--org-full {
+  width: 100%;
+}
+
 .inline-field--date {
   width: 110px;
   text-align: center;

@@ -93,17 +93,16 @@ export function ReportForm({ data, onChange }: Props) {
         операции, в ходе которой был проведен допрос одного из членов
       </p>
 
-      <p className="doc-para doc-bold">
-        очень странного цирка &ldquo;
+      <p className="doc-para">
         <input
           type="text"
-          className="inline-field inline-field--org"
+          className="inline-field inline-field--org-full"
           style={{ fontWeight: 700 }}
           value={data.organizationName}
           onChange={(e) => setField("organizationName", e.target.value)}
-          placeholder="Название организации"
+          placeholder={'очень странного цирка "The Families"'}
         />
-        &rdquo;, в процессе которого мне удалось узнать следующую информацию:
+        , в процессе которого мне удалось узнать следующую информацию:
       </p>
 
       {/* ── Interrogation Items ── */}
