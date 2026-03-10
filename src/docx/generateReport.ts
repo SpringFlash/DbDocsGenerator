@@ -17,12 +17,20 @@ import { ReportData } from "../types";
 import { ReportAssets } from "./loadAssets";
 
 const FONT = "Courier New";
+const FONT_TITLE = "Arial";
 const FONT_SIZE = 24; // 12pt in half-points
 const TITLE_SIZE = 52; // 26pt in half-points
 
 const noBorder = {
   top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
   bottom: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+  left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+  right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+};
+
+const underlinedBorder = {
+  top: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
+  bottom: { style: BorderStyle.SINGLE, size: 1, color: "000000" },
   left: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
   right: { style: BorderStyle.NONE, size: 0, color: "FFFFFF" },
 };
@@ -44,6 +52,10 @@ function centeredImage(
   });
 }
 
+function emptyLine(): Paragraph {
+  return new Paragraph({ children: [] });
+}
+
 export async function generateReport(
   data: ReportData,
   assets: ReportAssets
@@ -59,7 +71,12 @@ export async function generateReport(
     new Paragraph({
       spacing: { before: 40, after: 40 },
       children: [
-        new TextRun({ text: `${label} `, bold: true, font: FONT, size: FONT_SIZE }),
+        new TextRun({
+          text: `${label} `,
+          bold: true,
+          font: FONT,
+          size: FONT_SIZE,
+        }),
         new ExternalHyperlink({
           link: url,
           children: [
@@ -77,7 +94,6 @@ export async function generateReport(
     });
 
   const interrogationParagraphs = items.flatMap((item, idx) => [
-    // Item text
     new Paragraph({
       alignment: AlignmentType.JUSTIFIED,
       spacing: { before: 300, after: 60 },
@@ -90,7 +106,6 @@ export async function generateReport(
         }),
       ],
     }),
-    // Timestamp link on separate line
     new Paragraph({
       spacing: { before: 0, after: 120 },
       children: [
@@ -115,13 +130,13 @@ export async function generateReport(
     sections: [
       {
         children: [
-          // 1. LSPD Detective Bureau logo (header)
-          centeredImage(assets.lspdLogo, 200, 200),
+          // 1. LSPD Detective Bureau logo (header) — wider
+          centeredImage(assets.lspdLogo, 240, 240),
 
           // 2. Decorative divider
           centeredImage(assets.divider, 500, 15),
 
-          // 3. Title — big bold centered
+          // 3. Title — Arial, big bold centered
           new Paragraph({
             alignment: AlignmentType.CENTER,
             spacing: { before: 200, after: 0 },
@@ -129,7 +144,7 @@ export async function generateReport(
               new TextRun({
                 text: "Interrogation",
                 bold: true,
-                font: FONT,
+                font: FONT_TITLE,
                 size: TITLE_SIZE,
               }),
             ],
@@ -141,7 +156,7 @@ export async function generateReport(
               new TextRun({
                 text: `Report №${reportNumber}`,
                 bold: true,
-                font: FONT,
+                font: FONT_TITLE,
                 size: TITLE_SIZE,
               }),
             ],
@@ -172,14 +187,31 @@ export async function generateReport(
             ],
           }),
 
-          // 5. Org paragraph — bold justified
+          // 5. Org paragraph — org name bold, rest normal
           new Paragraph({
             alignment: AlignmentType.JUSTIFIED,
             spacing: { before: 0, after: 200 },
             children: [
               new TextRun({
-                text: `очень странного цирка \u201C${organizationName}\u201D, в процессе которого мне удалось узнать следующую информацию:`,
+                text: `очень странного цирка \u201C`,
                 bold: true,
+                font: FONT,
+                size: FONT_SIZE,
+              }),
+              new TextRun({
+                text: organizationName,
+                bold: true,
+                font: FONT,
+                size: FONT_SIZE,
+              }),
+              new TextRun({
+                text: `\u201D`,
+                bold: true,
+                font: FONT,
+                size: FONT_SIZE,
+              }),
+              new TextRun({
+                text: `, в процессе которого мне удалось узнать следующую информацию:`,
                 font: FONT,
                 size: FONT_SIZE,
               }),
@@ -189,7 +221,12 @@ export async function generateReport(
           // 6. Interrogation items
           ...interrogationParagraphs,
 
-          // 7. Evidence section
+          // 7. Empty lines before Evidence
+          emptyLine(),
+          emptyLine(),
+          emptyLine(),
+
+          // 8. Evidence section
           evidenceLink("Evidence:", "[Video]", evidenceData.evidence),
           evidenceLink(
             "Evidence of a violation:",
@@ -207,7 +244,7 @@ export async function generateReport(
             evidenceData.identityPerson
           ),
 
-          // 8. SEALED image (right-aligned)
+          // 9. SEALED image (right-aligned)
           new Paragraph({
             alignment: AlignmentType.RIGHT,
             spacing: { before: 400, after: 200 },
@@ -220,7 +257,7 @@ export async function generateReport(
             ],
           }),
 
-          // 9. Footer table
+          // 10. Footer table — date and agent underlined
           new Table({
             width: { size: 100, type: WidthType.PERCENTAGE },
             rows: [
@@ -241,9 +278,10 @@ export async function generateReport(
                     ],
                   }),
                   new TableCell({
-                    borders: noBorder,
+                    borders: underlinedBorder,
                     children: [
                       new Paragraph({
+                        alignment: AlignmentType.CENTER,
                         children: [
                           new TextRun({
                             text: date,
@@ -260,9 +298,10 @@ export async function generateReport(
                     children: [new Paragraph({ children: [] })],
                   }),
                   new TableCell({
-                    borders: noBorder,
+                    borders: underlinedBorder,
                     children: [
                       new Paragraph({
+                        alignment: AlignmentType.CENTER,
                         children: [
                           new TextRun({
                             text: agentId,
@@ -279,7 +318,7 @@ export async function generateReport(
             ],
           }),
 
-          // 10. TOP SECRET stamp (left-aligned footer)
+          // 11. TOP SECRET stamp (left-aligned footer)
           new Paragraph({
             alignment: AlignmentType.LEFT,
             spacing: { before: 200 },
