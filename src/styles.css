@@ -192,12 +192,14 @@ body {
   margin-bottom: 16px;
 }
 .doc-image--sealed {
-  width: 240px;
+  width: 180px;
   margin: 24px 0 24px auto;
+  transform: rotate(-8deg);
 }
 .doc-image--top-secret {
   width: 140px;
   margin: 32px 0 0;
+  transform: rotate(12deg);
 }
 
 /* ── Document text ── */
