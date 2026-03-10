@@ -3,6 +3,7 @@ import { saveAs } from "file-saver";
 import type { ReportData, InterrogationItem } from "../types";
 import { loadAssets } from "../docx/loadAssets";
 import { generateReport } from "../docx/generateReport";
+import { initGoogleAuth, uploadToDrive } from "../google/uploadToDrive";
 
 const darkStyle: React.CSSProperties = {
   backgroundColor: "#1e1e1e",
@@ -77,6 +78,10 @@ const initialData: ReportData = {
 export function ReportForm() {
   const [data, setData] = useState<ReportData>(initialData);
   const [generating, setGenerating] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [googleDocsUrl, setGoogleDocsUrl] = useState<string | null>(null);
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
 
   async function handleGenerate() {
     setGenerating(true);
@@ -86,6 +91,21 @@ export function ReportForm() {
       saveAs(blob, `Report №${data.reportNumber}.docx`);
     } finally {
       setGenerating(false);
+    }
+  }
+
+  async function handleUploadToDrive() {
+    setUploading(true);
+    setGoogleDocsUrl(null);
+    try {
+      const assets = await loadAssets();
+      const blob = await generateReport(data, assets);
+      const fileName = `Report №${data.reportNumber}.docx`;
+      initGoogleAuth(googleClientId!);
+      const url = await uploadToDrive(blob, fileName);
+      setGoogleDocsUrl(url);
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -267,13 +287,43 @@ export function ReportForm() {
       </div>
 
       {/* Submit */}
-      <button
-        style={{ ...buttonStyle, padding: "10px 20px", opacity: generating ? 0.5 : 1 }}
-        disabled={generating}
-        onClick={handleGenerate}
-      >
-        {generating ? "Generating..." : "Generate DOCX"}
-      </button>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+        <button
+          style={{ ...buttonStyle, padding: "10px 20px", opacity: generating ? 0.5 : 1 }}
+          disabled={generating}
+          onClick={handleGenerate}
+        >
+          {generating ? "Generating..." : "Generate DOCX"}
+        </button>
+
+        {googleClientId && (
+          <button
+            style={{
+              ...buttonStyle,
+              padding: "10px 20px",
+              backgroundColor: "#1a6e3c",
+              opacity: uploading ? 0.5 : 1,
+            }}
+            disabled={uploading}
+            onClick={handleUploadToDrive}
+          >
+            {uploading ? "Uploading..." : "Upload to Google Docs"}
+          </button>
+        )}
+      </div>
+
+      {googleDocsUrl && (
+        <div style={{ marginTop: 12 }}>
+          <a
+            href={googleDocsUrl}
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: "#4ec9b0" }}
+          >
+            {googleDocsUrl}
+          </a>
+        </div>
+      )}
     </div>
   );
 }
