@@ -1,5 +1,8 @@
 import { useState } from "react";
+import { saveAs } from "file-saver";
 import type { ReportData, InterrogationItem } from "../types";
+import { loadAssets } from "../docx/loadAssets";
+import { generateReport } from "../docx/generateReport";
 
 const darkStyle: React.CSSProperties = {
   backgroundColor: "#1e1e1e",
@@ -73,6 +76,18 @@ const initialData: ReportData = {
 
 export function ReportForm() {
   const [data, setData] = useState<ReportData>(initialData);
+  const [generating, setGenerating] = useState(false);
+
+  async function handleGenerate() {
+    setGenerating(true);
+    try {
+      const assets = await loadAssets();
+      const blob = await generateReport(data, assets);
+      saveAs(blob, `Report №${data.reportNumber}.docx`);
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   function setField<K extends keyof ReportData>(key: K, value: ReportData[K]) {
     setData((prev) => ({ ...prev, [key]: value }));
@@ -252,8 +267,12 @@ export function ReportForm() {
       </div>
 
       {/* Submit */}
-      <button style={{ ...buttonStyle, opacity: 0.5, cursor: "not-allowed", padding: "10px 20px" }} disabled>
-        Generate DOCX
+      <button
+        style={{ ...buttonStyle, padding: "10px 20px", opacity: generating ? 0.5 : 1 }}
+        disabled={generating}
+        onClick={handleGenerate}
+      >
+        {generating ? "Generating..." : "Generate DOCX"}
       </button>
     </div>
   );
