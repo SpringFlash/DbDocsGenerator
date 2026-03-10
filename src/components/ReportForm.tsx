@@ -51,11 +51,11 @@ export function ReportForm({ data, onChange }: Props) {
 
   return (
     <>
-      {/* ── TOP SECRET ── */}
+      {/* ── LSPD Logo (header) ── */}
       <img
-        src={basePath + "image1.png"}
-        alt="TOP SECRET"
-        className="doc-image doc-image--top-secret"
+        src={basePath + "image4.png"}
+        alt="LSPD Detective Bureau"
+        className="doc-image doc-image--logo"
       />
 
       {/* ── Divider ── */}
@@ -101,7 +101,7 @@ export function ReportForm({ data, onChange }: Props) {
           style={{ fontWeight: 700 }}
           value={data.organizationName}
           onChange={(e) => setField("organizationName", e.target.value)}
-          placeholder="Organization Name"
+          placeholder="Название организации"
         />
         &rdquo;, в процессе которого мне удалось узнать следующую информацию:
       </p>
@@ -113,7 +113,7 @@ export function ReportForm({ data, onChange }: Props) {
             <button
               className="item-remove"
               onClick={() => removeItem(index)}
-              title="Remove item"
+              title="Удалить пункт"
             >
               ×
             </button>
@@ -137,7 +137,9 @@ export function ReportForm({ data, onChange }: Props) {
               type="text"
               className="inline-field inline-field--timestamp"
               value={item.timestampFrom}
-              onChange={(e) => setItemField(index, "timestampFrom", e.target.value)}
+              onChange={(e) =>
+                setItemField(index, "timestampFrom", e.target.value)
+              }
               placeholder="00:00"
             />
             <span>-</span>
@@ -145,7 +147,9 @@ export function ReportForm({ data, onChange }: Props) {
               type="text"
               className="inline-field inline-field--timestamp"
               value={item.timestampTo}
-              onChange={(e) => setItemField(index, "timestampTo", e.target.value)}
+              onChange={(e) =>
+                setItemField(index, "timestampTo", e.target.value)
+              }
               placeholder="00:00"
             />
             <span className="item-timestamp-bracket">]</span>
@@ -153,7 +157,9 @@ export function ReportForm({ data, onChange }: Props) {
               type="text"
               className="inline-field inline-field--link"
               value={item.youtubeLink}
-              onChange={(e) => setItemField(index, "youtubeLink", e.target.value)}
+              onChange={(e) =>
+                setItemField(index, "youtubeLink", e.target.value)
+              }
               placeholder="https://youtube.com/..."
               style={{ marginLeft: 8 }}
             />
@@ -162,7 +168,7 @@ export function ReportForm({ data, onChange }: Props) {
       ))}
 
       <button className="add-item-btn" onClick={addItem}>
-        <span style={{ fontSize: 16 }}>+</span> Add interrogation item
+        <span style={{ fontSize: 16 }}>+</span> Добавить пункт допроса
       </button>
 
       {/* ── SEALED ── */}
@@ -235,11 +241,11 @@ export function ReportForm({ data, onChange }: Props) {
         <div className="doc-bold">{data.agentId || "DB-XXXXXX"}</div>
       </div>
 
-      {/* ── LSPD Logo ── */}
+      {/* ── TOP SECRET (footer) ── */}
       <img
-        src={basePath + "image4.png"}
-        alt="LSPD Detective Bureau"
-        className="doc-image doc-image--logo"
+        src={basePath + "image1.png"}
+        alt="TOP SECRET"
+        className="doc-image doc-image--top-secret"
       />
     </>
   );

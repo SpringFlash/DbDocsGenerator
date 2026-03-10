@@ -83,8 +83,8 @@ export async function generateReport(data: ReportData, assets: ReportAssets): Pr
     sections: [
       {
         children: [
-          // 1. TOP SECRET image
-          centeredImage(assets.topSecret, 300, 250),
+          // 1. LSPD Detective Bureau logo (header)
+          centeredImage(assets.lspdLogo, 200, 200),
 
           // 2. Decorative divider
           centeredImage(assets.divider, 500, 15),
@@ -160,8 +160,8 @@ export async function generateReport(data: ReportData, assets: ReportAssets): Pr
             ],
           }),
 
-          // 10. LSPD logo
-          centeredImage(assets.lspdLogo, 200, 200),
+          // 10. TOP SECRET stamp (footer)
+          centeredImage(assets.topSecret, 300, 250),
         ],
       },
     ],

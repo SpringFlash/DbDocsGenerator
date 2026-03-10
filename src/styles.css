@@ -183,9 +183,9 @@ body {
   display: block;
   margin: 0 auto;
 }
-.doc-image--top-secret {
-  width: 240px;
-  margin-bottom: 4px;
+.doc-image--logo {
+  width: 160px;
+  margin: 0 auto 4px;
 }
 .doc-image--divider {
   width: 400px;
@@ -195,8 +195,8 @@ body {
   width: 240px;
   margin: 24px auto;
 }
-.doc-image--logo {
-  width: 160px;
+.doc-image--top-secret {
+  width: 240px;
   margin: 32px auto 0;
 }
 

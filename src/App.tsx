@@ -63,8 +63,8 @@ export default function App() {
         <div className="toolbar-logo">
           <img src={basePath + "image4.png"} alt="LSPD" />
           <div>
-            <div className="toolbar-title">DB Report Editor</div>
-            <div className="toolbar-subtitle">Detective Bureau</div>
+            <div className="toolbar-title">Редактор отчётов DB</div>
+            <div className="toolbar-subtitle">Детективное бюро</div>
           </div>
         </div>
 
@@ -77,7 +77,7 @@ export default function App() {
             rel="noreferrer"
             className="toolbar-link"
           >
-            Open in Google Docs ↗
+            Открыть в Google Docs ↗
           </a>
         )}
 
@@ -87,7 +87,7 @@ export default function App() {
             disabled={uploading}
             onClick={handleUploadToDrive}
           >
-            {uploading ? "Uploading..." : "↑ Google Docs"}
+            {uploading ? "Загрузка..." : "↑ Google Docs"}
           </button>
         )}
 
@@ -96,7 +96,7 @@ export default function App() {
           disabled={generating}
           onClick={handleGenerate}
         >
-          {generating ? "Generating..." : "↓ Download .docx"}
+          {generating ? "Генерация..." : "↓ Скачать .docx"}
         </button>
       </div>
 
