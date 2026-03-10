@@ -124,14 +124,23 @@ export async function generateReport(data: ReportData, assets: ReportAssets): Pr
           // 6. Interrogation items
           ...interrogationParagraphs,
 
-          // 7. SEALED image
-          centeredImage(assets.sealed, 300, 80),
-
-          // 8. Evidence section
+          // 7. Evidence section
           evidenceLink("Evidence:", "[Video]", evidenceData.evidence),
           evidenceLink("Evidence of a violation:", "[video]", evidenceData.evidenceViolation),
           evidenceLink("Evidence Servers:", "[video]", evidenceData.evidenceServers),
           evidenceLink("The identity of the person: ", "[photo]", evidenceData.identityPerson),
+
+          // 8. SEALED image (right-aligned)
+          new Paragraph({
+            alignment: AlignmentType.RIGHT,
+            children: [
+              new ImageRun({
+                data: assets.sealed,
+                transformation: { width: 300, height: 80 },
+                type: "png",
+              }),
+            ],
+          }),
 
           // 9. Footer table
           new Table({
@@ -160,8 +169,17 @@ export async function generateReport(data: ReportData, assets: ReportAssets): Pr
             ],
           }),
 
-          // 10. TOP SECRET stamp (footer)
-          centeredImage(assets.topSecret, 300, 250),
+          // 10. TOP SECRET stamp (left-aligned footer)
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new ImageRun({
+                data: assets.topSecret,
+                transformation: { width: 150, height: 125 },
+                type: "png",
+              }),
+            ],
+          }),
         ],
       },
     ],

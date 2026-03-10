@@ -193,11 +193,11 @@ body {
 }
 .doc-image--sealed {
   width: 240px;
-  margin: 24px auto;
+  margin: 24px 0 24px auto;
 }
 .doc-image--top-secret {
-  width: 240px;
-  margin: 32px auto 0;
+  width: 140px;
+  margin: 32px 0 0;
 }
 
 /* ── Document text ── */

@@ -171,13 +171,6 @@ export function ReportForm({ data, onChange }: Props) {
         <span style={{ fontSize: 16 }}>+</span> Добавить пункт допроса
       </button>
 
-      {/* ── SEALED ── */}
-      <img
-        src={basePath + "image3.png"}
-        alt="SEALED"
-        className="doc-image doc-image--sealed"
-      />
-
       {/* ── Evidence ── */}
       <div className="evidence-line">
         <span className="evidence-label">Evidence:</span>{" "}
@@ -227,6 +220,13 @@ export function ReportForm({ data, onChange }: Props) {
         />
       </div>
 
+      {/* ── SEALED (right-aligned) ── */}
+      <img
+        src={basePath + "image3.png"}
+        alt="SEALED"
+        className="doc-image doc-image--sealed"
+      />
+
       {/* ── Footer ── */}
       <div className="doc-footer">
         <div>
@@ -241,7 +241,7 @@ export function ReportForm({ data, onChange }: Props) {
         <div className="doc-bold">{data.agentId || "DB-XXXXXX"}</div>
       </div>
 
-      {/* ── TOP SECRET (footer) ── */}
+      {/* ── TOP SECRET (left-aligned footer) ── */}
       <img
         src={basePath + "image1.png"}
         alt="TOP SECRET"
