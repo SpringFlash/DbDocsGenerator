@@ -1,329 +1,246 @@
-import { useState } from "react";
-import { saveAs } from "file-saver";
 import type { ReportData, InterrogationItem } from "../types";
-import { loadAssets } from "../docx/loadAssets";
-import { generateReport } from "../docx/generateReport";
-import { initGoogleAuth, uploadToDrive } from "../google/uploadToDrive";
 
-const darkStyle: React.CSSProperties = {
-  backgroundColor: "#1e1e1e",
-  color: "#d4d4d4",
-};
+const basePath = import.meta.env.BASE_URL + "assets/";
 
-const inputStyle: React.CSSProperties = {
-  backgroundColor: "#2d2d2d",
-  color: "#d4d4d4",
-  border: "1px solid #444",
-  padding: "6px 8px",
-  borderRadius: 4,
-  width: "100%",
-  boxSizing: "border-box",
-};
+interface Props {
+  data: ReportData;
+  onChange: (data: ReportData) => void;
+}
 
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  marginBottom: 4,
-  color: "#9cdcfe",
-  fontSize: 13,
-};
-
-const fieldStyle: React.CSSProperties = {
-  marginBottom: 12,
-};
-
-const sectionStyle: React.CSSProperties = {
-  border: "1px solid #444",
-  borderRadius: 6,
-  padding: 16,
-  marginBottom: 16,
-  backgroundColor: "#252526",
-};
-
-const buttonStyle: React.CSSProperties = {
-  backgroundColor: "#0e639c",
-  color: "#fff",
-  border: "none",
-  padding: "6px 14px",
-  borderRadius: 4,
-  cursor: "pointer",
-};
-
-const removeButtonStyle: React.CSSProperties = {
-  ...buttonStyle,
-  backgroundColor: "#8b1a1a",
-  marginLeft: 8,
-};
-
-const emptyItem = (): InterrogationItem => ({
-  text: "",
-  timestampFrom: "",
-  timestampTo: "",
-  youtubeLink: "",
-});
-
-const initialData: ReportData = {
-  reportNumber: 0,
-  agentId: "",
-  organizationName: "",
-  date: "",
-  items: [emptyItem()],
-  evidenceData: {
-    evidence: "",
-    evidenceViolation: "",
-    evidenceServers: "",
-    identityPerson: "",
-  },
-};
-
-export function ReportForm() {
-  const [data, setData] = useState<ReportData>(initialData);
-  const [generating, setGenerating] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [googleDocsUrl, setGoogleDocsUrl] = useState<string | null>(null);
-
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
-
-  async function handleGenerate() {
-    setGenerating(true);
-    try {
-      const assets = await loadAssets();
-      const blob = await generateReport(data, assets);
-      saveAs(blob, `Report №${data.reportNumber}.docx`);
-    } finally {
-      setGenerating(false);
-    }
-  }
-
-  async function handleUploadToDrive() {
-    setUploading(true);
-    setGoogleDocsUrl(null);
-    try {
-      const assets = await loadAssets();
-      const blob = await generateReport(data, assets);
-      const fileName = `Report №${data.reportNumber}.docx`;
-      initGoogleAuth(googleClientId!);
-      const url = await uploadToDrive(blob, fileName);
-      setGoogleDocsUrl(url);
-    } finally {
-      setUploading(false);
-    }
-  }
-
+export function ReportForm({ data, onChange }: Props) {
   function setField<K extends keyof ReportData>(key: K, value: ReportData[K]) {
-    setData((prev) => ({ ...prev, [key]: value }));
+    onChange({ ...data, [key]: value });
   }
 
-  function setEvidenceField(key: keyof ReportData["evidenceData"], value: string) {
-    setData((prev) => ({
-      ...prev,
-      evidenceData: { ...prev.evidenceData, [key]: value },
-    }));
-  }
-
-  function setItemField(index: number, key: keyof InterrogationItem, value: string) {
-    setData((prev) => {
-      const items = [...prev.items];
-      items[index] = { ...items[index], [key]: value };
-      return { ...prev, items };
+  function setEvidenceField(
+    key: keyof ReportData["evidenceData"],
+    value: string
+  ) {
+    onChange({
+      ...data,
+      evidenceData: { ...data.evidenceData, [key]: value },
     });
   }
 
+  function setItemField(
+    index: number,
+    key: keyof InterrogationItem,
+    value: string
+  ) {
+    const items = [...data.items];
+    items[index] = { ...items[index], [key]: value };
+    onChange({ ...data, items });
+  }
+
   function addItem() {
-    setData((prev) => ({ ...prev, items: [...prev.items, emptyItem()] }));
+    onChange({
+      ...data,
+      items: [
+        ...data.items,
+        { text: "", timestampFrom: "", timestampTo: "", youtubeLink: "" },
+      ],
+    });
   }
 
   function removeItem(index: number) {
-    setData((prev) => ({
-      ...prev,
-      items: prev.items.filter((_, i) => i !== index),
-    }));
+    onChange({
+      ...data,
+      items: data.items.filter((_, i) => i !== index),
+    });
   }
 
   return (
-    <div style={darkStyle}>
-      {/* Basic info */}
-      <div style={sectionStyle}>
-        <h3 style={{ marginTop: 0, color: "#ce9178" }}>Report Info</h3>
+    <>
+      {/* ── TOP SECRET ── */}
+      <img
+        src={basePath + "image1.png"}
+        alt="TOP SECRET"
+        className="doc-image doc-image--top-secret"
+      />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          <div style={fieldStyle}>
-            <label style={labelStyle}>Report Number</label>
-            <input
-              type="number"
-              style={inputStyle}
-              value={data.reportNumber || ""}
-              onChange={(e) => setField("reportNumber", Number(e.target.value))}
-            />
+      {/* ── Divider ── */}
+      <img
+        src={basePath + "image2.png"}
+        alt=""
+        className="doc-image doc-image--divider"
+      />
+
+      {/* ── Title ── */}
+      <div className="doc-title">Interrogation</div>
+      <div className="doc-title" style={{ marginBottom: 20 }}>
+        Report №
+        <input
+          type="number"
+          className="inline-field inline-field--number"
+          value={data.reportNumber || ""}
+          onChange={(e) => setField("reportNumber", Number(e.target.value))}
+          placeholder="—"
+        />
+      </div>
+
+      {/* ── Intro ── */}
+      <p className="doc-para">
+        Я, агент{" "}
+        <input
+          type="text"
+          className="inline-field inline-field--agent"
+          style={{ fontWeight: 700 }}
+          value={data.agentId}
+          onChange={(e) => setField("agentId", e.target.value)}
+          placeholder="DB-XXXXXX"
+        />
+        , спешу доложить вышестоящим лицам, об успешно проведенной специальной
+        операции, в ходе которой был проведен допрос одного из членов
+      </p>
+
+      <p className="doc-para doc-bold">
+        очень странного цирка &ldquo;
+        <input
+          type="text"
+          className="inline-field inline-field--org"
+          style={{ fontWeight: 700 }}
+          value={data.organizationName}
+          onChange={(e) => setField("organizationName", e.target.value)}
+          placeholder="Organization Name"
+        />
+        &rdquo;, в процессе которого мне удалось узнать следующую информацию:
+      </p>
+
+      {/* ── Interrogation Items ── */}
+      {data.items.map((item, index) => (
+        <div className="interrogation-item" key={index}>
+          {data.items.length > 1 && (
+            <button
+              className="item-remove"
+              onClick={() => removeItem(index)}
+              title="Remove item"
+            >
+              ×
+            </button>
+          )}
+
+          <div className="item-header">
+            <span className="item-number">{index + 1}.</span>
           </div>
 
-          <div style={fieldStyle}>
-            <label style={labelStyle}>Date</label>
-            <input
-              type="date"
-              style={inputStyle}
-              value={data.date}
-              onChange={(e) => setField("date", e.target.value)}
-            />
-          </div>
+          <textarea
+            className="inline-field--text"
+            value={item.text}
+            onChange={(e) => setItemField(index, "text", e.target.value)}
+            placeholder="Гражданин признался, что..."
+            rows={2}
+          />
 
-          <div style={fieldStyle}>
-            <label style={labelStyle}>Agent ID</label>
+          <div className="item-timestamp">
+            <span className="item-timestamp-bracket">[</span>
             <input
               type="text"
-              style={inputStyle}
-              value={data.agentId}
-              onChange={(e) => setField("agentId", e.target.value)}
+              className="inline-field inline-field--timestamp"
+              value={item.timestampFrom}
+              onChange={(e) => setItemField(index, "timestampFrom", e.target.value)}
+              placeholder="00:00"
             />
-          </div>
-
-          <div style={fieldStyle}>
-            <label style={labelStyle}>Organization Name</label>
+            <span>-</span>
             <input
               type="text"
-              style={inputStyle}
-              value={data.organizationName}
-              onChange={(e) => setField("organizationName", e.target.value)}
+              className="inline-field inline-field--timestamp"
+              value={item.timestampTo}
+              onChange={(e) => setItemField(index, "timestampTo", e.target.value)}
+              placeholder="00:00"
+            />
+            <span className="item-timestamp-bracket">]</span>
+            <input
+              type="text"
+              className="inline-field inline-field--link"
+              value={item.youtubeLink}
+              onChange={(e) => setItemField(index, "youtubeLink", e.target.value)}
+              placeholder="https://youtube.com/..."
+              style={{ marginLeft: 8 }}
             />
           </div>
         </div>
+      ))}
+
+      <button className="add-item-btn" onClick={addItem}>
+        <span style={{ fontSize: 16 }}>+</span> Add interrogation item
+      </button>
+
+      {/* ── SEALED ── */}
+      <img
+        src={basePath + "image3.png"}
+        alt="SEALED"
+        className="doc-image doc-image--sealed"
+      />
+
+      {/* ── Evidence ── */}
+      <div className="evidence-line">
+        <span className="evidence-label">Evidence:</span>{" "}
+        <span className="evidence-link-display">[Video]</span>{" "}
+        <input
+          type="text"
+          className="inline-field inline-field--link"
+          value={data.evidenceData.evidence}
+          onChange={(e) => setEvidenceField("evidence", e.target.value)}
+          placeholder="https://..."
+        />
       </div>
 
-      {/* Interrogation items */}
-      <div style={sectionStyle}>
-        <h3 style={{ marginTop: 0, color: "#ce9178" }}>Interrogation Items</h3>
-
-        {data.items.map((item, index) => (
-          <div
-            key={index}
-            style={{
-              border: "1px solid #3c3c3c",
-              borderRadius: 4,
-              padding: 12,
-              marginBottom: 12,
-              backgroundColor: "#1e1e1e",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-              <span style={{ color: "#858585", fontSize: 13 }}>Item #{index + 1}</span>
-              {data.items.length > 1 && (
-                <button style={removeButtonStyle} onClick={() => removeItem(index)}>
-                  Remove
-                </button>
-              )}
-            </div>
-
-            <div style={fieldStyle}>
-              <label style={labelStyle}>Text</label>
-              <textarea
-                style={{ ...inputStyle, minHeight: 80, resize: "vertical" }}
-                value={item.text}
-                onChange={(e) => setItemField(index, "text", e.target.value)}
-              />
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 2fr", gap: 12 }}>
-              <div style={fieldStyle}>
-                <label style={labelStyle}>Timestamp From</label>
-                <input
-                  type="text"
-                  style={inputStyle}
-                  placeholder="00:00"
-                  value={item.timestampFrom}
-                  onChange={(e) => setItemField(index, "timestampFrom", e.target.value)}
-                />
-              </div>
-
-              <div style={fieldStyle}>
-                <label style={labelStyle}>Timestamp To</label>
-                <input
-                  type="text"
-                  style={inputStyle}
-                  placeholder="00:00"
-                  value={item.timestampTo}
-                  onChange={(e) => setItemField(index, "timestampTo", e.target.value)}
-                />
-              </div>
-
-              <div style={fieldStyle}>
-                <label style={labelStyle}>YouTube Link</label>
-                <input
-                  type="text"
-                  style={inputStyle}
-                  value={item.youtubeLink}
-                  onChange={(e) => setItemField(index, "youtubeLink", e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-
-        <button style={buttonStyle} onClick={addItem}>
-          + Add Item
-        </button>
+      <div className="evidence-line">
+        <span className="evidence-label">Evidence of a violation:</span>{" "}
+        <span className="evidence-link-display">[video]</span>{" "}
+        <input
+          type="text"
+          className="inline-field inline-field--link"
+          value={data.evidenceData.evidenceViolation}
+          onChange={(e) => setEvidenceField("evidenceViolation", e.target.value)}
+          placeholder="https://..."
+        />
       </div>
 
-      {/* Evidence */}
-      <div style={sectionStyle}>
-        <h3 style={{ marginTop: 0, color: "#ce9178" }}>Evidence</h3>
-
-        {(
-          [
-            ["evidence", "Evidence URL"],
-            ["evidenceViolation", "Evidence Violation URL"],
-            ["evidenceServers", "Evidence Servers URL"],
-            ["identityPerson", "Identity Person URL"],
-          ] as const
-        ).map(([key, label]) => (
-          <div key={key} style={fieldStyle}>
-            <label style={labelStyle}>{label}</label>
-            <input
-              type="text"
-              style={inputStyle}
-              value={data.evidenceData[key]}
-              onChange={(e) => setEvidenceField(key, e.target.value)}
-            />
-          </div>
-        ))}
+      <div className="evidence-line">
+        <span className="evidence-label">Evidence Servers:</span>{" "}
+        <span className="evidence-link-display">[video]</span>{" "}
+        <input
+          type="text"
+          className="inline-field inline-field--link"
+          value={data.evidenceData.evidenceServers}
+          onChange={(e) => setEvidenceField("evidenceServers", e.target.value)}
+          placeholder="https://..."
+        />
       </div>
 
-      {/* Submit */}
-      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-        <button
-          style={{ ...buttonStyle, padding: "10px 20px", opacity: generating ? 0.5 : 1 }}
-          disabled={generating}
-          onClick={handleGenerate}
-        >
-          {generating ? "Generating..." : "Generate DOCX"}
-        </button>
-
-        {googleClientId && (
-          <button
-            style={{
-              ...buttonStyle,
-              padding: "10px 20px",
-              backgroundColor: "#1a6e3c",
-              opacity: uploading ? 0.5 : 1,
-            }}
-            disabled={uploading}
-            onClick={handleUploadToDrive}
-          >
-            {uploading ? "Uploading..." : "Upload to Google Docs"}
-          </button>
-        )}
+      <div className="evidence-line">
+        <span className="evidence-label">The identity of the person:</span>{" "}
+        <span className="evidence-link-display">[photo]</span>{" "}
+        <input
+          type="text"
+          className="inline-field inline-field--link"
+          value={data.evidenceData.identityPerson}
+          onChange={(e) => setEvidenceField("identityPerson", e.target.value)}
+          placeholder="https://..."
+        />
       </div>
 
-      {googleDocsUrl && (
-        <div style={{ marginTop: 12 }}>
-          <a
-            href={googleDocsUrl}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: "#4ec9b0" }}
-          >
-            {googleDocsUrl}
-          </a>
+      {/* ── Footer ── */}
+      <div className="doc-footer">
+        <div>
+          Date:{" "}
+          <input
+            type="date"
+            className="inline-field inline-field--date"
+            value={data.date}
+            onChange={(e) => setField("date", e.target.value)}
+          />
         </div>
-      )}
-    </div>
+        <div className="doc-bold">{data.agentId || "DB-XXXXXX"}</div>
+      </div>
+
+      {/* ── LSPD Logo ── */}
+      <img
+        src={basePath + "image4.png"}
+        alt="LSPD Detective Bureau"
+        className="doc-image doc-image--logo"
+      />
+    </>
   );
 }
