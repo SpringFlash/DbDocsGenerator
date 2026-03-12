@@ -232,14 +232,15 @@ export async function generateReport(
             evidenceData.identityPerson
           ),
 
-          // 9. SEALED image (right-aligned)
+          // 9. SEALED image (right-aligned, smaller, slightly beyond margin)
           new Paragraph({
             alignment: AlignmentType.RIGHT,
             spacing: { before: 400, after: 200 },
+            indent: { right: -400 },
             children: [
               new ImageRun({
                 data: assets.sealed,
-                transformation: { width: 300, height: 80 },
+                transformation: { width: 200, height: 55 },
                 type: "png",
               }),
             ],
